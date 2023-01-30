@@ -31,6 +31,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     implementation 'com.h2database:h2:1.4.197'
+
+    // AsyncItemProcessor / AsyncItemWriter
+    implementation 'org.springframework.batch:spring-batch-integration'
 }
 
 tasks.named('test') {
