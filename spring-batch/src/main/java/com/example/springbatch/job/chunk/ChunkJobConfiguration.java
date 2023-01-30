@@ -2,6 +2,7 @@ package com.example.springbatch.job.chunk;
 
 
 import com.example.springbatch.job.chunk.listener.CompleteStepListener;
+import com.example.springbatch.utils.DataUtil;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +77,7 @@ public class ChunkJobConfiguration {
     @Bean
     @StepScope
     protected ItemReader<String> itemReader() {
-        return new ListItemReader<>(getItems());
+        return new ListItemReader<>(DataUtil.getItems());
     }
 
     @Bean
@@ -120,13 +121,5 @@ public class ChunkJobConfiguration {
 //        });
 //    }
 
-    public List<String> getItems() {
-        List<String> items = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            items.add(i + " Hello");
-        }
-
-        return items;
-    }
 
 }
