@@ -1,4 +1,4 @@
-package com.example.springbatch.utils;
+package com.example.springbatch.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;
