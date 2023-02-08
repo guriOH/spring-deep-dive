@@ -1,44 +1,47 @@
-//package com.example.springbatch.job.chunk.reader;
-//
-//
-//import com.example.springbatch.job.chunk.dto.SampleDTO;
-//import org.springframework.batch.item.ItemReader;
-//import org.springframework.batch.item.file.FlatFileItemReader;
-//import org.springframework.batch.item.file.FlatFileItemWriter;
-//import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-//import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-//import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-//import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy;
-//import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-//import org.springframework.core.io.FileSystemResource;
-//
-//import java.nio.charset.StandardCharsets;
-//
-//public class CustomItemReader {
-//
-//
-//
-//    public ItemReader<SampleDTO> getFlatFileItemReader(){
-//
-//        DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
-//        lineTokenizer.setStrict(true); // default
-//        lineTokenizer.setNames(new String[]{"name", "number"});
-//        lineTokenizer.setIncludedFields(new int[]{0,1});
-//
-//        BeanWrapperFieldSetMapper<SampleDTO> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-//        fieldSetMapper.setStrict(true); // default
-//        fieldSetMapper.setTargetType(SampleDTO.class);
-//
-//
-//        DefaultLineMapper<SampleDTO> lineMapper = new DefaultLineMapper<>();
-//        lineMapper.setFieldSetMapper(fieldSetMapper);
-//        lineMapper.setLineTokenizer(lineTokenizer);
-//
-//
-//        FlatFileItemReader<SampleDTO> flatFileItemReader = new FlatFileItemReader<>();
-//        flatFileItemReader.setEncoding(StandardCharsets.UTF_8.name());
-//        flatFileItemReader.setResource(getFileSystemResource(csvFilePath));
-//        flatFileItemReader.setLineMapper(lineMapper);
-//    }
-//
-//}
+package com.example.springbatch.job.chunk.reader;
+
+
+import com.example.springbatch.job.chunk.dto.SampleDTO;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.core.io.FileSystemResource;
+
+
+public class CustomItemReader {
+
+
+    public FlatFileItemReader<SampleDTO> readCSVFileReader()
+    {
+        //Create reader instance
+        FlatFileItemReader<SampleDTO> reader = new FlatFileItemReader<SampleDTO>();
+
+        //Set input file location
+        reader.setResource(new FileSystemResource("input/sourceData.csv"));
+
+        //Set number of lines to skips. Use it if file has header rows.
+        reader.setLinesToSkip(1);
+
+        reader.setStrict(false);
+        //Configure how each line will be parsed and mapped to different values
+        reader.setLineMapper(new DefaultLineMapper() {
+            {
+                //3 columns in each row
+                setLineTokenizer(new DelimitedLineTokenizer() {
+                    {
+                        setNames(new String[] { "id", "firstName", "lastName" });
+                    }
+                });
+                //Set values in SampleDTO class
+                setFieldSetMapper(new BeanWrapperFieldSetMapper<SampleDTO>() {
+                    {
+                        setTargetType(SampleDTO.class);
+                    }
+                });
+            }
+        });
+        return reader;
+    }
+
+}

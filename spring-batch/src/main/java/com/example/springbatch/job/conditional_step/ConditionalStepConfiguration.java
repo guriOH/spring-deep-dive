@@ -17,7 +17,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Slf4j
 @Configuration
 public class ConditionalStepConfiguration {
-
     @Bean
     public Job conditionalStepJob(JobRepository jobRepository, @Qualifier("conditionalStep1") Step step){
         return new JobBuilder("conditionalStepJob", jobRepository)

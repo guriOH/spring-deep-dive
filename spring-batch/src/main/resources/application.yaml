@@ -17,7 +17,7 @@ spring:
       show-sql: true
     batch:
       jdbc:
-        initialize-schema: embedded
+        initialize-schema: always
 #  spring.datasource.url=jdbc:mysql://127.0.0.1:3306/data_warehouse
 #  spring.datasource.username=root
 #  spring.datasource.password=root

@@ -2,6 +2,7 @@ package com.example.springbatch.job.chunk;
 
 
 import com.example.springbatch.job.chunk.dto.SampleDTO;
+import com.example.springbatch.job.chunk.writer.CustomItemWriter;
 import com.example.springbatch.persistance.entities.SampleData;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,8 @@ public class FlatFileJobConfiguration {
 
     private final EntityManagerFactory entityManagerFactory;
 
+    private final CustomItemWriter customItemWriter;
+
     @Bean
     public Job readCSVFileJob(JobRepository jobRepository) throws Exception {
         return new JobBuilder("readCSVFileJob", jobRepository)
@@ -51,7 +54,7 @@ public class FlatFileJobConfiguration {
                 .reader(readCSVFileReader())
                 .processor(readCSVFileProcessor())
 //                .writer(readCSVFileWriter())
-                .writer(jpaItemWriter())
+                .writer(customItemWriter.jpaItemWriter())
                 .build();
     }
 
@@ -59,9 +62,8 @@ public class FlatFileJobConfiguration {
     public ItemProcessor<? super SampleDTO, ? extends SampleData> readCSVFileProcessor() {
         return (item -> {
             SampleData sampleData = new SampleData();
-            sampleData.setId(sampleData.getId());
-            sampleData.setFirstName(sampleData.getFirstName());
-            sampleData.setLastName(sampleData.getLastName());
+            sampleData.setFirstName(item.getFirstName());
+            sampleData.setLastName(item.getLastName());
             return sampleData;
         });
     }
@@ -100,41 +102,41 @@ public class FlatFileJobConfiguration {
         });
         return reader;
     }
-
-    @Bean
-    public FlatFileItemWriter<SampleDTO> readCSVFileWriter() throws Exception {
-
-        //csv파일에 작성할 데이터를 추출하기 위해서 fieldExtractor 객체가 필요
-        BeanWrapperFieldExtractor<SampleDTO> extractor = new BeanWrapperFieldExtractor();
-        extractor.setNames(new String[] {"id","firstName","lastName"}); //필드명 설정
-
-        //line 구분값 설정
-        DelimitedLineAggregator<SampleDTO> lineAggreator = new DelimitedLineAggregator<>();
-        lineAggreator.setDelimiter(",");
-        lineAggreator.setFieldExtractor(extractor);
-
-        FlatFileItemWriter<SampleDTO> writer = new FlatFileItemWriterBuilder<SampleDTO>()
-            .name("csvItemWriter")
-            .encoding("UTF-8")
-            .resource(new FileSystemResource("output/test.csv")) //경로 지정
-            .lineAggregator(lineAggreator)
-            .headerCallback(writer1 -> writer1.write("id,name,address")) //header설정
-            .footerCallback(writer1 -> writer1.write("---------------\n")) //footer설정
-            .build();
-
-        writer.afterPropertiesSet();
-
-        return writer;
-    }
-
-
-
-    @Bean
-    public ItemWriter<SampleData> jpaItemWriter(){
-        return new JpaItemWriterBuilder<SampleData>()
-                .entityManagerFactory(entityManagerFactory)
-                .build();
-    }
+//
+//    @Bean
+//    public FlatFileItemWriter<SampleDTO> readCSVFileWriter() throws Exception {
+//
+//        //csv파일에 작성할 데이터를 추출하기 위해서 fieldExtractor 객체가 필요
+//        BeanWrapperFieldExtractor<SampleDTO> extractor = new BeanWrapperFieldExtractor();
+//        extractor.setNames(new String[] {"id","firstName","lastName"}); //필드명 설정
+//
+//        //line 구분값 설정
+//        DelimitedLineAggregator<SampleDTO> lineAggreator = new DelimitedLineAggregator<>();
+//        lineAggreator.setDelimiter(",");
+//        lineAggreator.setFieldExtractor(extractor);
+//
+//        FlatFileItemWriter<SampleDTO> writer = new FlatFileItemWriterBuilder<SampleDTO>()
+//            .name("csvItemWriter")
+//            .encoding("UTF-8")
+//            .resource(new FileSystemResource("output/test.csv")) //경로 지정
+//            .lineAggregator(lineAggreator)
+//            .headerCallback(writer1 -> writer1.write("id,name,address")) //header설정
+//            .footerCallback(writer1 -> writer1.write("---------------\n")) //footer설정
+//            .build();
+//
+//        writer.afterPropertiesSet();
+//
+//        return writer;
+//    }
+//
+//
+//
+//    @Bean
+//    public ItemWriter<SampleData> jpaItemWriter(){
+//        return new JpaItemWriterBuilder<SampleData>()
+//                .entityManagerFactory(entityManagerFactory)
+//                .build();
+//    }
 }
 
 
